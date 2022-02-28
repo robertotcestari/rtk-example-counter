@@ -1,22 +1,14 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import Counter from './Counter';
-import { configureStore } from '@reduxjs/toolkit';
-import countReducer from './counterSlice';
-import { Provider } from 'react-redux';
-
+import renderWithReducer from '../../test-utils';
 import userEvent from '@testing-library/user-event';
 
+
+
 describe('Counter Test', () => {
-  beforeEach(() => {});
+ 
   it('starts with count 0', () => {
-    const store = configureStore({
-      reducer: countReducer,
-    });
-    render(
-      <Provider store={store}>
-        <Counter />
-      </Provider>
-    );
+    renderWithReducer(<Counter/>, {preloadedState: {count: 0}})
     const countEl = screen.getByRole('heading', {
       level: 3,
       name: /count: 0/i,
@@ -26,14 +18,8 @@ describe('Counter Test', () => {
   });
 
   it('increase by 1 when button clicked', () => {
-    const store = configureStore({
-      reducer: countReducer,
-    });
-    render(
-      <Provider store={store}>
-        <Counter />
-      </Provider>
-    );
+    renderWithReducer(<Counter/>)
+
 
     const buttonEl = screen.getByRole('button', { name: 'Increment' });
     userEvent.click(buttonEl);
@@ -49,14 +35,8 @@ describe('Counter Test', () => {
   });
 
   it('decrease by 1 when button clicked', () => {
-    const store = configureStore({
-      reducer: countReducer,
-    });
-    render(
-      <Provider store={store}>
-        <Counter />
-      </Provider>
-    );
+    renderWithReducer(<Counter/>)
+
     const buttonEl = screen.getByRole('button', { name: 'Decrement' });
 
     userEvent.click(buttonEl);
@@ -64,6 +44,23 @@ describe('Counter Test', () => {
     const countEl = screen.getByRole('heading', {
       level: 3,
       name: /count: -1/i,
+    });
+
+    expect(countEl).toBeInTheDocument();
+  });
+
+  it('increase by amount on form', () => {
+    renderWithReducer(<Counter/>)
+
+    const formEl = screen.getByRole('textbox')
+    userEvent.clear(formEl)
+    userEvent.type(formEl, "15")
+    const buttonEl = screen.getByRole('button', { name: /Increment by/i });
+    userEvent.click(buttonEl);
+
+    const countEl = screen.getByRole('heading', {
+      level: 3,
+      name: /count: 15/i,
     });
 
     expect(countEl).toBeInTheDocument();
